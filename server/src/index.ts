@@ -1,5 +1,10 @@
-// TODO: Implementation
+import express from "express";
+import noop from "lodash/fp/noop.js";
 
-const x = 1;
+import healthCheck from "./apis/healthCheck.js";
 
-export default x;
+const app = express();
+const port = 3000; // TODO: Move to config
+
+app.use("/health-check", healthCheck);
+app.listen(port, noop);
