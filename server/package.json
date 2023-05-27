@@ -5,6 +5,13 @@
   "license": "BSD-3-Clause",
   "private": false,
   "type": "module",
+  "scripts": {
+    "typecheck": "npx tsc --noEmit",
+    "format": "npx prettier --write src",
+    "format-check": "npx prettier --check src",
+    "lint": "npx eslint src --fix",
+    "build": "npx gulp default"
+  },
   "devDependencies": {
     "@babel/core": "^7.22.1",
     "@babel/preset-typescript": "^7.21.5",
