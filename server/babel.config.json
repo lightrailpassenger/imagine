@@ -1,0 +1,13 @@
+{
+    "presets": [
+        "@babel/preset-typescript"
+    ],
+    "targets": {
+        "node": "current"
+    },
+    "include": [
+        "src/**/*.js",
+        "src/**/*.ts"
+    ],
+    "sourceType": "module"
+}
