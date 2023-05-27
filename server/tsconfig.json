@@ -2,7 +2,8 @@
     "compilerOptions": {
         "strict": true,
         "allowSyntheticDefaultImports": true,
-        "module": "es2022"
+        "module": "es2022",
+        "moduleResolution": "nodenext"
     },
     "include": [
         "src/**/*.ts"
