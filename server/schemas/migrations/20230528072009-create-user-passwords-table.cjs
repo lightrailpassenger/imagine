@@ -4,18 +4,19 @@
 module.exports = {
     async up (queryInterface, Sequelize) {
         await queryInterface.sequelize.query(
-            `CREATE TABLE users (
-                id UUID NOT NULL DEFAULT GEN_RANDOM_UUID() UNIQUE,
-                client_side_id UUID NOT NULL DEFAULT GEN_RANDOM_UUID() UNIQUE,
-                name TEXT NOT NULL UNIQUE,
+            `CREATE TABLE user_passwords (
+                user_id UUID UNIQUE NOT NULL REFERENCES users(id),
+                password_hash TEXT NOT NULL,
+                salt TEXT NOT NULL,
+                version INTEGER NOT NULL DEFAULT 1,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-            )`,
-      );
+            )`
+        );
     },
 
     async down (queryInterface, Sequelize) {
         await queryInterface.sequelize.query(
-            `DROP TABLE IF EXISTS users`,
-        );
+            `DROP TABLE IF EXISTS user_passwords`,
+        )
     },
 };

@@ -2,6 +2,15 @@
     "presets": [
         "@babel/preset-typescript"
     ],
+    "plugins": [
+        [
+            "@babel/plugin-syntax-import-attributes",
+            {
+                "deprecatedAssertSyntax": true,
+            }
+        ],
+        "@babel/plugin-proposal-import-attributes-to-assertions"
+    ],
     "targets": {
         "node": "current"
     },

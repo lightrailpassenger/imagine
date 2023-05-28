@@ -2,8 +2,10 @@
     "compilerOptions": {
         "strict": true,
         "allowSyntheticDefaultImports": true,
-        "module": "es2022",
-        "moduleResolution": "nodenext"
+        "module": "esnext",
+        "moduleResolution": "nodenext",
+        "resolveJsonModule": true,
+        "target": "esnext"
     },
     "include": [
         "src/**/*.ts"
