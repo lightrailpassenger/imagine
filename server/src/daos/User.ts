@@ -1,3 +1,5 @@
+import { randomUUID } from "crypto";
+
 import type { Pool } from "pg";
 
 import type PasswordHasher from "../tools/PasswordHasher.js";
@@ -12,33 +14,79 @@ class User {
     }
 
     async create(
-        name: string,
+        username: string,
         password: string
     ): Promise<{
-        isCreated: boolean;
-        isLoginSuccessful: boolean;
-        id: string;
-        clientSideId: string;
+        clientSideId: string | null;
     }> {
         const client = await this.#pool.connect();
 
         try {
             await client.query("BEGIN");
-            const { rowCount } = await client.query(
+            const { rows, rowCount } = await client.query(
                 `INSERT INTO users (name) VALUES ($1)
-                 ON CONFLICT DO NOTHING`,
-                [name]
+                 ON CONFLICT DO NOTHING
+                 RETURNING id, client_side_id AS "clientSideId"`,
+                [username]
             );
             const isCreated = rowCount !== 0;
 
+            if (isCreated) {
+                const [{ id, clientSideId }] = rows;
+                const newSalt = await this.#passwordHasher.getSalt();
+                const newSaltString = newSalt.toString("hex");
+                const passwordHash = await this.#passwordHasher.hashPassword(
+                    password,
+                    newSalt
+                );
+
+                await client.query(
+                    `INSERT INTO user_passwords (user_id, password_hash, salt)
+                    VALUES ($1, $2, $3)
+                    ON CONFLICT DO NOTHING`,
+                    [id, passwordHash.toString("hex"), newSaltString]
+                );
+                await client.query("COMMIT");
+
+                return { clientSideId };
+            }
+
+            await client.query("ROLLBACK");
+
+            return { clientSideId: null };
+        } catch (err) {
+            await client.query("ROLLBACK");
+
+            throw err;
+        } finally {
+            client.release();
+        }
+    }
+
+    async login(
+        username: string,
+        password: string
+    ): Promise<{ isLoginSuccessful: boolean; clientSideId: string }> {
+        const client = await this.#pool.connect();
+
+        try {
+            await client.query("BEGIN");
+            const placeHolderId = randomUUID();
             const {
-                rows: [{ id, clientSideId }],
+                rowCount,
+                rows: [
+                    { id, clientSideId } = {
+                        id: placeHolderId,
+                        clientSideId: placeHolderId,
+                    },
+                ],
             } = await client.query(
                 `SELECT id, client_side_id AS "clientSideId"
                  FROM users
                  WHERE name = $1`,
-                [name]
+                [username]
             );
+            const hasUser = rowCount === 1;
             const {
                 rows: [existingPasswordRow],
             } = await client.query(
@@ -50,34 +98,30 @@ class User {
 
             const newSalt = await this.#passwordHasher.getSalt();
             const newSaltString = newSalt.toString("hex");
-            const correctSaltString = existingPasswordRow
-                ? existingPasswordRow.salt
-                : newSaltString;
+            const correctSaltString =
+                hasUser && existingPasswordRow
+                    ? existingPasswordRow.salt
+                    : newSaltString;
             const correctSalt = Buffer.from(correctSaltString, "hex");
             const passwordHash = await this.#passwordHasher.hashPassword(
                 password,
                 correctSalt
             );
-            const correctHash = existingPasswordRow
-                ? existingPasswordRow.hash
-                : passwordHash;
+            const correctHash =
+                hasUser && existingPasswordRow
+                    ? existingPasswordRow.hash
+                    : passwordHash;
             const { successful } = await this.#passwordHasher.verifyPassword(
                 passwordHash,
                 correctHash
             );
 
-            await client.query(
-                `INSERT INTO user_passwords (user_id, password_hash, salt)
-                VALUES ($1, $2, $3)
-                ON CONFLICT DO NOTHING`,
-                [id, correctHash.toString("hex"), correctSaltString]
-            );
             await client.query("COMMIT");
 
             return {
-                isCreated,
-                isLoginSuccessful: successful,
-                id,
+                isLoginSuccessful: Boolean(
+                    hasUser && existingPasswordRow && successful
+                ),
                 clientSideId,
             };
         } catch (err) {
