@@ -2,13 +2,20 @@ import joi from "joi";
 
 import { Router } from "express";
 
+import createLoginMiddleware from "../middlewares/createLoginMiddleware.js";
+
 import { isValidInput } from "../tools/Validator.js";
 
 import type { ObjectSchema } from "joi";
 
 import type UserOperations from "../daos/User.js";
+import type { ReqType } from "../middlewares/createLoginMiddleware.js";
+import type JWTHandler from "../tools/JWTHandler.js";
 
-function createRouter(userOperations: UserOperations): Router {
+function createRouter(
+    userOperations: UserOperations,
+    loginTokenHandler: JWTHandler
+): Router {
     const router = Router();
 
     router.post("/login", async (req, res) => {
@@ -41,7 +48,7 @@ function createRouter(userOperations: UserOperations): Router {
 
             if (isLoginSuccessful) {
                 return res.status(200).send({
-                    token: clientSideId,
+                    token: await loginTokenHandler.issue({ clientSideId }),
                 });
             } else {
                 return res.status(400).send({
@@ -90,7 +97,7 @@ function createRouter(userOperations: UserOperations): Router {
 
             if (clientSideId) {
                 return res.status(201).send({
-                    token: clientSideId,
+                    token: await loginTokenHandler.issue({ clientSideId }),
                 });
             } else {
                 return res.status(400).send({
@@ -105,6 +112,32 @@ function createRouter(userOperations: UserOperations): Router {
             });
         }
     });
+
+    router.get(
+        "/login",
+        createLoginMiddleware(loginTokenHandler),
+        async (req, res) => {
+            try {
+                const { isLoginSuccessful, clientSideId } = req as typeof req &
+                    ReqType;
+
+                if (isLoginSuccessful) {
+                    return res.status(200).send({
+                        res: "OK",
+                        clientSideId,
+                    });
+                } else {
+                    return res.status(401).send({
+                        err: "Login Required",
+                    });
+                }
+            } catch (err) {
+                return res.status(500).send({
+                    err: "Internal Server Error",
+                });
+            }
+        }
+    );
 
     return router;
 }
