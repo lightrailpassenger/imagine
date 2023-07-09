@@ -1,5 +1,6 @@
 import joi from "joi";
 import multer from "multer";
+import { fileTypeFromBuffer } from "file-type";
 
 import { Router } from "express";
 
@@ -13,6 +14,8 @@ import type UserOperations from "../daos/User.js";
 import type UserImageOperations from "../daos/UserImage.js";
 import type { ReqType } from "../middlewares/createLoginMiddleware.js";
 import type JWTHandler from "../tools/JWTHandler.js";
+
+const allowedMimeTypes = ["image/png", "image/jpeg"];
 
 function createRouter(
     userOperations: UserOperations,
@@ -59,6 +62,15 @@ function createRouter(
                     });
                 }
 
+                const fileType = await fileTypeFromBuffer(image);
+
+                if (!fileType || !allowedMimeTypes.includes(fileType.mime)) {
+                    return res.status(400).send({
+                        err: "Bad Request",
+                    });
+                }
+
+                const extension = `.${fileType.ext}`;
                 const userId = await userOperations.getUserIdFromClientSideId(
                     clientSideId
                 );
@@ -72,7 +84,7 @@ function createRouter(
                 const { id: userImageId } = await userImageOperations.create(
                     userId,
                     image,
-                    name
+                    name ? `${name}${extension}` : undefined
                 );
 
                 return res.status(201).send({
