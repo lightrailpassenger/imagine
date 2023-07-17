@@ -42,7 +42,29 @@ class UserImage {
             [userId]
         );
 
-        return rows;
+        return rows.map(({ id, name }) => ({ id, name }));
+    }
+
+    async getImageById(id: string): Promise<{
+        image: Buffer;
+        name: string;
+        userId: string;
+    } | null> {
+        const client = await this.#pool.connect();
+        const { rows } = await client.query(
+            `SELECT user_id AS "userId", image, name
+            FROM user_images
+            WHERE id = $1`,
+            [id]
+        );
+
+        return rows[0]
+            ? {
+                  image: rows[0].image,
+                  name: rows[0].name,
+                  userId: rows[0].userId,
+              }
+            : null;
     }
 }
 
