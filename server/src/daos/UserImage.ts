@@ -1,3 +1,5 @@
+import { extname } from "node:path";
+
 import type { Pool } from "pg";
 
 class UserImage {
@@ -26,6 +28,55 @@ class UserImage {
         );
 
         return { id: rows[0].id };
+    }
+
+    async renameImage(
+        id: string,
+        options: {
+            userId: string;
+            newName: string;
+        }
+    ): Promise<{ oldName: string } | null> {
+        const client = await this.#pool.connect();
+
+        try {
+            await client.query("BEGIN");
+
+            const { userId } = options;
+            const { rows } = await client.query(
+                `SELECT name
+                 FROM user_images
+                 WHERE user_id = $1 AND id = $2
+                 FOR UPDATE`,
+                [userId, id]
+            );
+
+            if (!rows[0]) {
+                await client.query("ROLLBACK");
+
+                return null;
+            }
+
+            const { name } = rows[0];
+            const extension = extname(name);
+            const newName = `${options.newName}${extension}`;
+
+            await client.query(
+                `UPDATE user_images
+                 SET name = $1
+                 WHERE user_id = $2 AND id = $3`,
+                [newName, userId, id]
+            );
+            await client.query("COMMIT");
+
+            return { oldName: name };
+        } catch (err) {
+            await client.query("ROLLBACK");
+
+            throw err;
+        } finally {
+            client.release();
+        }
     }
 
     async getImageByUserId(userId: string): Promise<

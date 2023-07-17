@@ -135,6 +135,68 @@ function createRouter(
         }
     );
 
+    router.patch(
+        "/:id",
+        createLoginMiddleware(loginTokenHandler),
+        async (req, res) => {
+            try {
+                const { isLoginSuccessful, clientSideId } = req as typeof req &
+                    ReqType;
+
+                if (!isLoginSuccessful) {
+                    return res.status(401).send({
+                        err: "Login Required",
+                    });
+                }
+
+                const { id } = req.params;
+                const { name } = req.body;
+
+                if (
+                    !id ||
+                    !name ||
+                    typeof id !== "string" ||
+                    typeof name !== "string"
+                ) {
+                    return res.status(400).send({
+                        err: "Bad Request",
+                    });
+                }
+
+                const userId = await userOperations.getUserIdFromClientSideId(
+                    clientSideId
+                );
+
+                if (!userId) {
+                    return res.status(401).send({
+                        err: "Login Required",
+                    });
+                }
+
+                const oldImageInfo = await userImageOperations.renameImage(id, {
+                    userId,
+                    newName: name,
+                });
+
+                if (!oldImageInfo) {
+                    return res.status(404).send({
+                        err: "Not Found",
+                    });
+                }
+
+                return res.status(200).send({
+                    oldName: oldImageInfo.oldName,
+                });
+            } catch (err) {
+                console.error(err);
+
+                return res.status(500).send({
+                    err: "Internal Server Error",
+                });
+            }
+        }
+    );
+
     router.post(
         "/",
         createLoginMiddleware(loginTokenHandler),
