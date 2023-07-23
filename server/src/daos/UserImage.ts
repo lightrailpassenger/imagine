@@ -149,6 +149,24 @@ class UserImage {
         return { token };
     }
 
+    async deleteShareLink(
+        token: string,
+        userId: string
+    ): Promise<{ existed: boolean }> {
+        const client = await this.#pool.connect();
+        const { rowCount } = await client.query(
+            `DELETE FROM image_share_links
+             USING user_images
+             WHERE
+                 user_images.user_id = $1 AND
+                 image_share_links.token = $2 AND
+                 user_images.id = image_share_links.image_id`,
+            [userId, token]
+        );
+
+        return { existed: rowCount > 0 };
+    }
+
     async getSharedImage(token: string): Promise<{
         name: string;
         image: Buffer;

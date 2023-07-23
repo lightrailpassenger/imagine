@@ -367,6 +367,62 @@ function createRouter(
         }
     });
 
+    router.delete(
+        "/share-link/:token",
+        createLoginMiddleware(loginTokenHandler),
+        async (req, res) => {
+            try {
+                const { isLoginSuccessful, clientSideId } = req as typeof req &
+                    ReqType;
+
+                if (!isLoginSuccessful) {
+                    return res.status(401).send({
+                        err: "Login Required",
+                    });
+                }
+
+                const { token } = req.params;
+
+                if (!token || typeof token !== "string") {
+                    return res.status(400).send({
+                        err: "Bad Request",
+                    });
+                }
+
+                const userId = await userOperations.getUserIdFromClientSideId(
+                    clientSideId
+                );
+
+                if (!userId) {
+                    return res.status(401).send({
+                        err: "Login Required",
+                    });
+                }
+
+                const { existed } = await userImageOperations.deleteShareLink(
+                    token,
+                    userId
+                );
+
+                if (!existed) {
+                    return res.status(404).send({
+                        err: "Not Found",
+                    });
+                }
+
+                return res.status(200).send({
+                    res: "OK",
+                });
+            } catch (err) {
+                console.error(err);
+
+                return res.status(500).send({
+                    err: "Internal Server Error",
+                });
+            }
+        }
+    );
+
     router.post(
         "/:id/share-link",
         createLoginMiddleware(loginTokenHandler),
