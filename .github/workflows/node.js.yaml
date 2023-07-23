@@ -2,9 +2,9 @@ name: Server Side CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main,ci-test]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   defaults:
@@ -20,18 +20,22 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - working-directory: server
   setup:
+    runs-on: macos-latest
     steps:
       - run: yarn
   typecheck:
     needs: setup
+    runs-on: macos-latest
     steps:
       - run: yarn typecheck
   build:
     needs: setup
+    runs-on: macos-latest
     steps:
       - run: yarn build
   check:
     needs: setup
+    runs-on: macos-latest
     steps:
       - run: npx prettier --check
       - run: npx eslint
