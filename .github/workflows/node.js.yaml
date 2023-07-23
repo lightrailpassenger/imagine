@@ -6,21 +6,22 @@ on:
   pull_request:
     branches: [main]
 
+defaults:
+  runs-on: macos-latest
+  strategy:
+    matrix:
+      node-version: [20.x]
+  steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+  run:
+    shell: bash
+    working-directory: server
+
 jobs:
-  defaults:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        node-version: [20.x]
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-    run:
-      shell: bash
-      working-directory: server
   setup:
     runs-on: macos-latest
     steps:
