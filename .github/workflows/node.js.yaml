@@ -18,7 +18,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - working-directory: server
+    run:
+      shell: bash
+      working-directory: server
   setup:
     runs-on: macos-latest
     steps:
