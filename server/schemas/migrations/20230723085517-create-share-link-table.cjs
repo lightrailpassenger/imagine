@@ -5,7 +5,7 @@ module.exports = {
         await queryInterface.sequelize.query(
             `CREATE TABLE image_share_links (
                  token TEXT PRIMARY KEY,
-                  image_id UUID NOT NULL REFERENCES user_images(id) ON DELETE CASCADE,
+                 image_id UUID NOT NULL REFERENCES user_images(id) ON DELETE CASCADE,
                  total_limit INTEGER NOT NULL DEFAULT 1,
                  used_limit INTEGER NOT NULL DEFAULT 0,
                  CHECK (total_limit > 0),
