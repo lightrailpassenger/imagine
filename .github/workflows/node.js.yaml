@@ -12,7 +12,7 @@ defaults:
     working-directory: server
 
 jobs:
-  defaults:
+  run:
     runs-on: macos-latest
     strategy:
       matrix:
@@ -24,23 +24,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-  setup:
-    runs-on: macos-latest
-    steps:
       - run: yarn
-  typecheck:
-    needs: setup
-    runs-on: macos-latest
-    steps:
       - run: yarn typecheck
-  build:
-    needs: setup
-    runs-on: macos-latest
-    steps:
       - run: yarn build
-  check:
-    needs: setup
-    runs-on: macos-latest
-    steps:
       - run: npx prettier --check
       - run: npx eslint
