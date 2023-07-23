@@ -148,6 +148,43 @@ class UserImage {
 
         return { token };
     }
+
+    async getSharedImage(token: string): Promise<{
+        name: string;
+        image: Buffer;
+    } | null> {
+        const client = await this.#pool.connect();
+        const { rows } = await client.query(
+            `UPDATE image_share_links
+             SET used_limit = used_limit + 1
+             WHERE total_limit > used_limit AND token = $1
+             RETURNING image_id AS "imageId"`,
+            [token]
+        );
+        const row = rows[0];
+
+        if (!row) {
+            return null;
+        }
+
+        const { imageId } = row;
+        const {
+            rows: [imageRow],
+        } = await client.query(
+            `SELECT image, name
+             FROM user_images
+             WHERE id = $1 AND (expire_at IS NULL OR expire_at > NOW())`,
+            [imageId]
+        );
+
+        if (imageRow) {
+            const { image, name } = imageRow;
+
+            return { image, name };
+        }
+
+        return null;
+    }
 }
 
 export default UserImage;

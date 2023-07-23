@@ -333,6 +333,40 @@ function createRouter(
         }
     );
 
+    router.post("/share-link/:token", async (req, res) => {
+        try {
+            const { token } = req.params;
+
+            if (!token || typeof token !== "string") {
+                return res.status(400).send({
+                    err: "Bad Request",
+                });
+            }
+
+            const imageInfo = await userImageOperations.getSharedImage(token);
+
+            if (!imageInfo) {
+                return res.status(404).send({
+                    err: "Not Found",
+                });
+            }
+
+            const { name, image } = imageInfo;
+
+            res.set({
+                "Content-Type": getContentTypeFromName(name),
+            });
+
+            return res.send(image);
+        } catch (err) {
+            console.error(err);
+
+            return res.status(500).send({
+                err: "Internal Server Error",
+            });
+        }
+    });
+
     router.post(
         "/:id/share-link",
         createLoginMiddleware(loginTokenHandler),
@@ -350,7 +384,7 @@ function createRouter(
                 const reqSchema: ObjectSchema<{
                     limit: number;
                 }> = joi.object({
-                    limit: joi.number().integer().positive().required(),
+                    limit: joi.number().integer().positive(),
                 });
 
                 const { id } = req.params;
