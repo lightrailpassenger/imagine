@@ -2,12 +2,17 @@ name: Server Side CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main,ci-test]
   pull_request:
-    branches: [ main ]
+    branches: [main]
+
+defaults:
+  run:
+    shell: bash
+    working-directory: server
 
 jobs:
-  defaults:
+  run:
     runs-on: macos-latest
     strategy:
       matrix:
@@ -18,20 +23,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - working-directory: server
-  setup:
-    steps:
+      - run: ls
       - run: yarn
-  typecheck:
-    needs: setup
-    steps:
       - run: yarn typecheck
-  build:
-    needs: setup
-    steps:
       - run: yarn build
-  check:
-    needs: setup
-    steps:
-      - run: npx prettier --check
+      - run: npx prettier --check src
       - run: npx eslint
