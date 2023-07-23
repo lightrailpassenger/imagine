@@ -1,5 +1,4 @@
 import express from "express";
-import noop from "lodash/fp/noop.js";
 
 import config from "config";
 
@@ -34,4 +33,6 @@ app.use("/users", userRoutes);
 app.use("/user-images", userImageRoutes);
 app.use("/health-check", healthCheck);
 
-app.listen(port, noop);
+app.listen(port, () => {
+    console.log(`Listening on port: ${port}`);
+});
