@@ -7,23 +7,28 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-
+  setup:
     runs-on: macos-latest
-
     strategy:
       matrix:
         node-version: [20.x]
-
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - run: cd server
-      - run: yarn
+      - run: cd server && yarn
+  typecheck:
+    needs: setup
+    steps:
       - run: yarn typecheck
+  build:
+    needs: setup
+    steps:
       - run: yarn build
+  check:
+    needs: setup
+    steps:
       - run: npx prettier --check
       - run: npx eslint
