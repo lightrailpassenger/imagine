@@ -2,7 +2,7 @@ import express from "express";
 
 import config from "config";
 
-import healthCheck from "./apis/healthCheck.js";
+import healthCheck from "./apis/health-check.js";
 import createUserRoutes from "./apis/user.js";
 import createUserImageRoutes from "./apis/user_image.js";
 
