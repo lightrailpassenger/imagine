@@ -117,6 +117,20 @@ class UserImage {
               }
             : null;
     }
+
+    async deleteImage(
+        id: string,
+        userId: string
+    ): Promise<{ existed: boolean }> {
+        const client = await this.#pool.connect();
+        const { rowCount } = await client.query(
+            `DELETE FROM user_images
+             WHERE id = $1 AND user_id = $2`,
+            [id, userId]
+        );
+
+        return { existed: rowCount > 0 }; // normally 0 or 1
+    }
 }
 
 export default UserImage;

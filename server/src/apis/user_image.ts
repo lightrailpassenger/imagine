@@ -6,7 +6,7 @@ import { Router } from "express";
 
 import createLoginMiddleware from "../middlewares/createLoginMiddleware.js";
 
-import { isValidInput } from "../tools/Validator.js";
+import { isUUID, isValidInput } from "../tools/Validator.js";
 
 import type { ObjectSchema } from "joi";
 
@@ -78,6 +78,62 @@ function createRouter(
         }
     );
 
+    router.delete(
+        "/:id",
+        createLoginMiddleware(loginTokenHandler),
+        async (req, res) => {
+            try {
+                const { isLoginSuccessful, clientSideId } = req as typeof req &
+                    ReqType;
+
+                if (!isLoginSuccessful) {
+                    return res.status(401).send({
+                        err: "Login Required",
+                    });
+                }
+
+                const { id } = req.params;
+
+                if (!id || !isUUID(id)) {
+                    return res.status(400).send({
+                        err: "Bad Request",
+                    });
+                }
+
+                const userId = await userOperations.getUserIdFromClientSideId(
+                    clientSideId
+                );
+
+                if (!userId) {
+                    return res.status(401).send({
+                        err: "Login Required",
+                    });
+                }
+
+                const { existed } = await userImageOperations.deleteImage(
+                    id,
+                    userId
+                );
+
+                if (!existed) {
+                    return res.status(404).send({
+                        err: "Not Found",
+                    });
+                }
+
+                return res.status(200).send({
+                    res: "OK",
+                });
+            } catch (err) {
+                console.error(err);
+
+                return res.status(500).send({
+                    err: "Internal Server Error",
+                });
+            }
+        }
+    );
+
     router.get(
         "/:id",
         createLoginMiddleware(loginTokenHandler),
@@ -94,7 +150,7 @@ function createRouter(
 
                 const { id } = req.params;
 
-                if (!id || typeof id !== "string") {
+                if (!id || !isUUID(id)) {
                     return res.status(400).send({
                         err: "Bad Request",
                     });
