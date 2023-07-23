@@ -4,7 +4,7 @@ import config from "config";
 
 import healthCheck from "./apis/health-check.js";
 import createUserRoutes from "./apis/user.js";
-import createUserImageRoutes from "./apis/user_image.js";
+import createUserImageRoutes from "./apis/user-image.js";
 
 import { pool } from "./daos/PgClient.js";
 import UserOperations from "./daos/User.js";

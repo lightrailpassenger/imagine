@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { extname } from "node:path";
 
 import type { Pool } from "pg";
@@ -130,6 +131,22 @@ class UserImage {
         );
 
         return { existed: rowCount > 0 }; // normally 0 or 1
+    }
+
+    async shareImage(id: string, limit: number): Promise<{ token: string }> {
+        const client = await this.#pool.connect();
+        const { rows } = await client.query(
+            `INSERT INTO image_share_links (
+                 token,
+                 total_limit,
+                 image_id
+             ) VALUES ($1, $2, $3)
+             RETURNING token`,
+            [Buffer.from(randomBytes(512 / 8)).toString("base64"), limit, id]
+        );
+        const [{ token }] = rows;
+
+        return { token };
     }
 }
 

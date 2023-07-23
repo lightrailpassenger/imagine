@@ -333,6 +333,72 @@ function createRouter(
         }
     );
 
+    router.post(
+        "/:id/share-link",
+        createLoginMiddleware(loginTokenHandler),
+        async (req, res) => {
+            try {
+                const { isLoginSuccessful, clientSideId } = req as typeof req &
+                    ReqType;
+
+                if (!isLoginSuccessful) {
+                    return res.status(401).send({
+                        err: "Login Required",
+                    });
+                }
+
+                const reqSchema: ObjectSchema<{
+                    limit: number;
+                }> = joi.object({
+                    limit: joi.number().integer().positive().required(),
+                });
+
+                const { id } = req.params;
+                const { value, error } = reqSchema.validate(req.body);
+
+                if (error || !id || !isUUID(id)) {
+                    return res.status(400).send({
+                        err: "Bad Request",
+                    });
+                }
+
+                const { limit } = value;
+                const userId = await userOperations.getUserIdFromClientSideId(
+                    clientSideId
+                );
+
+                if (!userId) {
+                    return res.status(401).send({
+                        err: "Login Required",
+                    });
+                }
+
+                const imageInfo = await userImageOperations.getImageById(id);
+
+                if (!imageInfo || imageInfo.userId !== userId) {
+                    return res.status(404).send({
+                        err: "Not Found",
+                    });
+                }
+
+                const { token } = await userImageOperations.shareImage(
+                    id,
+                    limit
+                );
+
+                return res.status(201).send({
+                    token,
+                });
+            } catch (err) {
+                console.error(err);
+
+                return res.status(500).send({
+                    err: "Internal Server Error",
+                });
+            }
+        }
+    );
+
     return router;
 }
 
