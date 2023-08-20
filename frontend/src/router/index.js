@@ -10,6 +10,16 @@ const router = createRouter({
             component: HomeView,
         },
         {
+            path: "/login",
+            name: "login",
+            component: () => Promise.reject(new Error("Not implmeneted")),
+        },
+        {
+            path: "/signup",
+            name: "signup",
+            component: () => Promise.reject(new Error("Not implemented")),
+        },
+        {
             path: "/about",
             name: "about",
             // route level code-splitting
