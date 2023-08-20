@@ -1,4 +1,10 @@
+@import url("https://fonts.cdnfonts.com/css/fira-sans");
+
 body {
     background: #ffcccc;
     margin: 0;
+}
+
+* {
+    font-family: 'Fira Sans', sans-serif;
 }
