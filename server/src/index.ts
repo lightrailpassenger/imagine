@@ -28,6 +28,14 @@ const userImageRoutes = createUserImageRoutes(
     loginTokenHandler
 );
 
+if (process.env.NODE_ENV === "development") {
+    app.use((req, res, next) => {
+        res.set("Access-Control-Allow-Headers", "Content-Type");
+        res.set("Access-Control-Allow-Origin", "http://localhost:5173");
+        next();
+    });
+}
+
 app.use(express.json({ limit: "1mb" }));
 app.use("/users", userRoutes);
 app.use("/user-images", userImageRoutes);

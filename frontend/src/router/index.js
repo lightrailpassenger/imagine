@@ -12,7 +12,7 @@ const router = createRouter({
         {
             path: "/login",
             name: "login",
-            component: () => Promise.reject(new Error("Not implmeneted")),
+            component: () => import("../views/LoginView.vue"),
         },
         {
             path: "/signup",

@@ -4,18 +4,25 @@ This contains the frontend of `imagine`.
 
 ## Project Setup
 
+Put environemnt variables into `.env.local`:
+```
+VITE_ENDPOINT_BASE_URL=http://localhost:3000
+```
+
+To run:
+
 ```sh
-npm install
+yarn
 ```
 
 ### Compile and Hot-Reload for Development
 
 ```sh
-npm run dev
+yarn dev
 ```
 
 ### Compile and Minify for Production
 
 ```sh
-npm run build
+yarn build
 ```
