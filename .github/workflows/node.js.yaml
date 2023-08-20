@@ -12,7 +12,7 @@ defaults:
     working-directory: server
 
 jobs:
-  run:
+  frontend:
     runs-on: macos-latest
     strategy:
       matrix:
@@ -23,7 +23,19 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - run: ls
+      - run: yarn
+      - run: npx prettier --check src
+  server:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
       - run: yarn
       - run: yarn typecheck
       - run: yarn build
