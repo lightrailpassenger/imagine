@@ -10,6 +10,7 @@ import { isUUID, isValidInput } from "../tools/Validator.js";
 
 import type { ObjectSchema } from "joi";
 
+import type VirusTotalClient from "../clients/VirusTotalClient.js";
 import type UserOperations from "../daos/User.js";
 import type UserImageOperations from "../daos/UserImage.js";
 import type { ReqType } from "../middlewares/createLoginMiddleware.js";
@@ -32,7 +33,8 @@ function getContentTypeFromName(name: string): AllowedMimeType {
 function createRouter(
     userOperations: UserOperations,
     userImageOperations: UserImageOperations,
-    loginTokenHandler: JWTHandler
+    loginTokenHandler: JWTHandler,
+    virusTotalClient: VirusTotalClient
 ): Router {
     const router = Router();
     const upload = multer();
@@ -314,11 +316,31 @@ function createRouter(
                     });
                 }
 
-                const { id: userImageId } = await userImageOperations.create(
+                // eslint-disable-next-line prefer-const -- Check why
+                let userImageId: string;
+
+                // TODO: This tends to be slow.
+                // Put checking into a separate worker / cron job.
+                res.on("finish", async () => {
+                    const { isPassed } = await virusTotalClient.check(image);
+
+                    if (typeof isPassed === "boolean") {
+                        await userImageOperations.markVirusChecked(userImageId);
+                    } else {
+                        const { pendingId } = isPassed;
+
+                        await userImageOperations.markVirusCheckPending(
+                            userImageId,
+                            pendingId
+                        );
+                    }
+                });
+
+                ({ id: userImageId } = await userImageOperations.create(
                     userId,
                     image,
                     name ? `${name}${extension}` : undefined
-                );
+                ));
 
                 return res.status(201).send({
                     id: userImageId,

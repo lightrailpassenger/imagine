@@ -203,6 +203,16 @@ class UserImage {
 
         return null;
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- TODO
+    async markVirusChecked(id: string): Promise<void> {
+        // TODO
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- TODO
+    async markVirusCheckPending(id: string, pendingId: string): Promise<void> {
+        // TODO
+    }
 }
 
 export default UserImage;
