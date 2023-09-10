@@ -9,12 +9,16 @@ const draftPassword = ref("");
 const submitting = ref(null);
 const error = ref(null);
 
+const onCreateUsername = () => {
+    draftUsername.value = crypto.randomUUID();
+};
+
 const onSubmitForm = () => {
     submitting.value = {
         username: draftUsername.value,
         password: draftPassword.value,
     };
-};
+}; // TODO: Add captcha
 
 watch(submitting, async () => {
     if (!submitting.value) {
@@ -22,7 +26,7 @@ watch(submitting, async () => {
     }
 
     const result = await fetch(
-        `${import.meta.env.VITE_ENDPOINT_BASE_URL}/users/login/`,
+        `${import.meta.env.VITE_ENDPOINT_BASE_URL}/users/`,
         {
             method: "post",
             body: JSON.stringify(toValue(submitting)),
@@ -51,10 +55,10 @@ watch(submitting, async () => {
 </script>
 
 <template>
-    <div class="login">
+    <div class="signup">
         <form @submit.prevent="onSubmitForm">
             <GoHomeButton />
-            <legend>Log In</legend>
+            <legend>Sign Up</legend>
             <input type="text" v-model="draftUsername" placeholder="Username" />
             <input
                 type="password"
@@ -62,7 +66,10 @@ watch(submitting, async () => {
                 placeholder="Password"
             />
             <div>
-                <button type="submit">Log In</button>
+                <button type="submit">Sign Up</button>
+                <button type="button" @click.prevent="onCreateUsername">
+                    Create username
+                </button>
                 <span class="error" v-if="error">{{ error }}</span>
             </div>
         </form>
@@ -70,7 +77,7 @@ watch(submitting, async () => {
 </template>
 
 <style scoped>
-.login {
+.signup {
     height: 100vh;
     display: flex;
     justify-content: center;
@@ -87,11 +94,12 @@ form {
 
 input {
     display: block;
+    min-width: 500px;
     font-size: 25px;
     margin: 5px;
 }
 
-button[type="submit"] {
+button {
     margin: 5px;
     font-size: 20px;
     border: 1px solid black;

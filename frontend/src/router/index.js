@@ -17,7 +17,7 @@ const router = createRouter({
         {
             path: "/signup",
             name: "signup",
-            component: () => Promise.reject(new Error("Not implemented")),
+            component: () => import("../views/SignupView.vue"),
         },
         {
             path: "/about",
