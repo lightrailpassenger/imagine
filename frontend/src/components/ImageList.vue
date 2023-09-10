@@ -14,6 +14,10 @@ const onClickLogout = () => {
     window.location.reload();
 };
 
+const onUpload = () => {
+    $router.push({ path: "/upload" });
+};
+
 onMounted(async () => {
     const result = await fetch(
         `${import.meta.env.VITE_ENDPOINT_BASE_URL}/user-images`,
@@ -39,7 +43,11 @@ onMounted(async () => {
 
 <template>
     <div v-if="imageList.length > 0" class="image-list">
-        <Header @logout.prevent="onClickLogout" />
+        <Header
+            shouldShowUpload="true"
+            @logout.prevent="onClickLogout"
+            @upload.prevent="onUpload"
+        />
         <ImageItem
             v-for="image in imageList"
             :id="image.id"

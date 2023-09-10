@@ -1,14 +1,16 @@
 <script setup>
-defineEmits(["logout"]);
+defineEmits(["logout", "upload"]);
+defineProps(["shouldShowUpload"]);
 </script>
 
 <template>
     <div class="title-container">
         <h1>Imagine</h1>
         <span class="space" />
-        <button class="logout-button" @click="$emit('logout', $event)">
-            Log out
+        <button v-if="shouldShowUpload" @click="$emit('upload', $event)">
+            Upload
         </button>
+        <button @click="$emit('logout', $event)">Log out</button>
     </div>
 </template>
 
@@ -29,11 +31,12 @@ h1 {
     flex: 1 1 0;
 }
 
-.logout-button {
+button {
     flex: 0 0 auto;
     background: transparent;
     border: 1px solid black;
     font-size: 18px;
     border-radius: 2px;
+    margin-left: 3px;
 }
 </style>

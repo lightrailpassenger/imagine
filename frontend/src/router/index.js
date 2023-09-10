@@ -25,6 +25,11 @@ const router = createRouter({
             component: () => import("../views/ImageListView.vue"),
         },
         {
+            path: "/upload",
+            name: "upload-page",
+            component: () => import("../views/UploadView.vue"),
+        },
+        {
             path: "/about",
             name: "about",
             // route level code-splitting

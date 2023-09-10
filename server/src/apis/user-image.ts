@@ -286,7 +286,7 @@ function createRouter(
                 const { name } = value;
                 const image = req.file?.buffer;
 
-                if (!image || (name && !isValidInput(name))) {
+                if (!image || (name && !isValidInput(name, 1))) {
                     return res.status(400).send({
                         err: "Bad Request",
                     });
