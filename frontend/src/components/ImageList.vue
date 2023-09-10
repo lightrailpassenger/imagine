@@ -2,6 +2,7 @@
 import { ref, onMounted, onUpdated } from "vue";
 import { useRouter } from "vue-router";
 
+import Header from "./Header.vue";
 import ImageItem from "./ImageItem.vue";
 
 const imageList = ref([]);
@@ -38,13 +39,7 @@ onMounted(async () => {
 
 <template>
     <div v-if="imageList.length > 0" class="image-list">
-        <div class="title-container">
-            <h1>Imagine</h1>
-            <span class="space" />
-            <button class="logout-button" @click.prevent="onClickLogout">
-                Log out
-            </button>
-        </div>
+        <Header @logout.prevent="onClickLogout" />
         <ImageItem
             v-for="image in imageList"
             :id="image.id"
@@ -55,30 +50,6 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.title-container {
-    display: flex;
-    flex-direction: row;
-    width: 680px;
-    align-items: center;
-}
-
-h1 {
-    flex: 0 0 auto;
-    font-size: 40px;
-}
-
-.space {
-    flex: 1 1 0;
-}
-
-.logout-button {
-    flex: 0 0 auto;
-    background: transparent;
-    border: 1px solid black;
-    font-size: 18px;
-    border-radius: 2px;
-}
-
 .image-list {
     height: 100vh;
     display: flex;
