@@ -34,7 +34,7 @@ const userImageRoutes = createUserImageRoutes(
 
 if (process.env.NODE_ENV === "development") {
     app.use((req, res, next) => {
-        res.set("Access-Control-Allow-Headers", "Content-Type");
+        res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
         res.set("Access-Control-Allow-Origin", "http://localhost:5173");
         next();
     });

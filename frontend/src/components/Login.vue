@@ -1,5 +1,6 @@
 <script setup>
 import { ref, toValue, watch } from "vue";
+import { useRouter } from "vue-router";
 
 import GoHomeButton from "./GoHomeButton.vue";
 
@@ -15,6 +16,8 @@ const onSubmitForm = () => {
         password: draftPassword.value,
     };
 };
+
+const $router = useRouter();
 
 watch(submitting, async () => {
     if (!submitting.value) {
@@ -37,6 +40,7 @@ watch(submitting, async () => {
         window.accessToken = token;
 
         error.value = null;
+        $router.push({ path: "/list" });
     } else {
         try {
             const { err } = await result.json();
