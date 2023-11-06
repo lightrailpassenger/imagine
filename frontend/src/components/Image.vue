@@ -38,7 +38,7 @@ onUnmounted(() => {
 
 <template>
     <div class="image-view">
-        <Header shouldShowUpload="false" @logout.prevent="onClickLogout" />
+        <Header :shouldShowUpload="false" @logout.prevent="onClickLogout" />
         <img alt="Secret image" :src="srcRef" />
     </div>
 </template>

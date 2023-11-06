@@ -44,7 +44,7 @@ onMounted(async () => {
 <template>
     <div v-if="imageList.length > 0" class="image-list">
         <Header
-            shouldShowUpload="true"
+            :shouldShowUpload="true"
             @logout.prevent="onClickLogout"
             @upload.prevent="onUpload"
         />
