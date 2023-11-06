@@ -42,7 +42,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 app.use(express.json({ limit: "1mb" }));
-app.use(nocache);
+app.use(nocache());
 app.use("/users", userRoutes);
 app.use("/user-images", userImageRoutes);
 app.use("/health-check", healthCheck);
