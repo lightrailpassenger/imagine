@@ -17,7 +17,7 @@ const onFileChange = (event) => {
 
 const onClickLogout = () => {
     window.accessToken = null;
-    window.location.reload();
+    $router.push({ path: "/" });
 };
 
 const onFormSubmit = () => {

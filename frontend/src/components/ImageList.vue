@@ -11,7 +11,7 @@ const $router = useRouter();
 
 const onClickLogout = () => {
     window.accessToken = null;
-    window.location.reload();
+    $router.push({ path: "/" });
 };
 
 const onUpload = () => {

@@ -1,13 +1,15 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
 
 import Header from "./Header.vue";
 
 const { imageId } = defineProps(["imageId"]);
 
+const $router = useRouter();
 const onClickLogout = () => {
     window.accessToken = null;
-    window.location.reload();
+    $router.push({ path: "/" });
 };
 const srcUrl = `${
     import.meta.env.VITE_ENDPOINT_BASE_URL
