@@ -1,11 +1,19 @@
 <script setup>
-defineProps(["id", "name"]);
+import { useRouter } from "vue-router";
+
+const { id } = defineProps(["id", "name"]);
+
+const $router = useRouter();
+
+const onView = () => {
+    $router.push({ path: `/view/${encodeURIComponent(id)}` });
+};
 </script>
 
 <template>
     <div class="item">
         <span class="name">{{ name }}</span>
-        <button @click.prevent="">View</button>
+        <button @click.prevent="onView">View</button>
     </div>
 </template>
 
