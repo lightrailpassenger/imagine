@@ -164,7 +164,11 @@ class UserImage {
                      image_id
                  ) VALUES ($1, $2, $3)
                  RETURNING token`,
-                [Buffer.from(randomBytes(512 / 8)).toString("base64"), limit, id]
+                [
+                    Buffer.from(randomBytes(512 / 8)).toString("base64"),
+                    limit,
+                    id,
+                ]
             );
             const [{ token }] = rows;
 
