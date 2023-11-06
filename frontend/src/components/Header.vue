@@ -1,11 +1,20 @@
 <script setup>
+import { useRouter } from "vue-router";
+
 defineEmits(["logout", "upload"]);
 defineProps(["shouldShowUpload"]);
+
+const $router = useRouter();
+const onVisitList = () => {
+    $router.push({
+        path: "/list",
+    });
+};
 </script>
 
 <template>
     <div class="title-container">
-        <h1>Imagine</h1>
+        <a href="/list" @click.prevent="onVisitList">Imagine</a>
         <span class="space" />
         <button v-if="shouldShowUpload" @click="$emit('upload', $event)">
             Upload
@@ -22,9 +31,17 @@ defineProps(["shouldShowUpload"]);
     align-items: center;
 }
 
-h1 {
+a {
     flex: 0 0 auto;
     font-size: 40px;
+    color: black;
+}
+
+a:hover,
+a:visited,
+a:active,
+a:link {
+    text-decoration: none;
 }
 
 .space {
