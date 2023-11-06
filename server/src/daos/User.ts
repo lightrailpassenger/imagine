@@ -67,12 +67,17 @@ class User {
         clientSideId: string
     ): Promise<string | null> {
         const client = await this.#pool.connect();
-        const { rows } = await client.query(
-            `SELECT id FROM users WHERE client_side_id = $1`,
-            [clientSideId]
-        );
 
-        return rows.length > 0 ? rows[0].id : null;
+        try {
+            const { rows } = await client.query(
+                `SELECT id FROM users WHERE client_side_id = $1`,
+                [clientSideId]
+            );
+
+            return rows.length > 0 ? rows[0].id : null;
+        } finally {
+            client.release();
+        }
     }
 
     async login(

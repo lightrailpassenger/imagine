@@ -17,18 +17,23 @@ class UserImage {
         expireAt?: Date
     ): Promise<{ id: string }> {
         const client = await this.#pool.connect();
-        const { rows } = await client.query(
-            `INSERT INTO user_images (
-                user_id,
-                image,
-                name,
-                expire_at
-            ) VALUES ($1, $2, $3, $4)
-            RETURNING id`,
-            [userId, image, name, expireAt]
-        );
 
-        return { id: rows[0].id };
+        try {
+            const { rows } = await client.query(
+                `INSERT INTO user_images (
+                    user_id,
+                    image,
+                    name,
+                    expire_at
+                ) VALUES ($1, $2, $3, $4)
+                RETURNING id`,
+                [userId, image, name, expireAt]
+            );
+
+            return { id: rows[0].id };
+        } finally {
+            client.release();
+        }
     }
 
     async renameImage(
@@ -87,14 +92,19 @@ class UserImage {
         }[]
     > {
         const client = await this.#pool.connect();
-        const { rows } = await client.query(
-            `SELECT id, name
-             FROM user_images
-             WHERE user_id = $1`,
-            [userId]
-        );
 
-        return rows.map(({ id, name }) => ({ id, name }));
+        try {
+            const { rows } = await client.query(
+                `SELECT id, name
+                 FROM user_images
+                 WHERE user_id = $1`,
+                [userId]
+            );
+
+            return rows.map(({ id, name }) => ({ id, name }));
+        } finally {
+            client.release();
+        }
     }
 
     async getImageById(id: string): Promise<{
@@ -103,20 +113,25 @@ class UserImage {
         userId: string;
     } | null> {
         const client = await this.#pool.connect();
-        const { rows } = await client.query(
-            `SELECT user_id AS "userId", image, name
-            FROM user_images
-            WHERE id = $1`,
-            [id]
-        );
 
-        return rows[0]
-            ? {
-                  image: rows[0].image,
-                  name: rows[0].name,
-                  userId: rows[0].userId,
-              }
-            : null;
+        try {
+            const { rows } = await client.query(
+                `SELECT user_id AS "userId", image, name
+                FROM user_images
+                WHERE id = $1`,
+                [id]
+            );
+
+            return rows[0]
+                ? {
+                      image: rows[0].image,
+                      name: rows[0].name,
+                      userId: rows[0].userId,
+                  }
+                : null;
+        } finally {
+            client.release();
+        }
     }
 
     async deleteImage(
@@ -124,29 +139,39 @@ class UserImage {
         userId: string
     ): Promise<{ existed: boolean }> {
         const client = await this.#pool.connect();
-        const { rowCount } = await client.query(
-            `DELETE FROM user_images
-             WHERE id = $1 AND user_id = $2`,
-            [id, userId]
-        );
 
-        return { existed: rowCount > 0 }; // normally 0 or 1
+        try {
+            const { rowCount } = await client.query(
+                `DELETE FROM user_images
+                 WHERE id = $1 AND user_id = $2`,
+                [id, userId]
+            );
+
+            return { existed: rowCount > 0 }; // normally 0 or 1
+        } finally {
+            client.release();
+        }
     }
 
     async shareImage(id: string, limit: number): Promise<{ token: string }> {
         const client = await this.#pool.connect();
-        const { rows } = await client.query(
-            `INSERT INTO image_share_links (
-                 token,
-                 total_limit,
-                 image_id
-             ) VALUES ($1, $2, $3)
-             RETURNING token`,
-            [Buffer.from(randomBytes(512 / 8)).toString("base64"), limit, id]
-        );
-        const [{ token }] = rows;
 
-        return { token };
+        try {
+            const { rows } = await client.query(
+                `INSERT INTO image_share_links (
+                     token,
+                     total_limit,
+                     image_id
+                 ) VALUES ($1, $2, $3)
+                 RETURNING token`,
+                [Buffer.from(randomBytes(512 / 8)).toString("base64"), limit, id]
+            );
+            const [{ token }] = rows;
+
+            return { token };
+        } finally {
+            client.release();
+        }
     }
 
     async deleteShareLink(
@@ -154,17 +179,22 @@ class UserImage {
         userId: string
     ): Promise<{ existed: boolean }> {
         const client = await this.#pool.connect();
-        const { rowCount } = await client.query(
-            `DELETE FROM image_share_links
-             USING user_images
-             WHERE
-                 user_images.user_id = $1 AND
-                 image_share_links.token = $2 AND
-                 user_images.id = image_share_links.image_id`,
-            [userId, token]
-        );
 
-        return { existed: rowCount > 0 };
+        try {
+            const { rowCount } = await client.query(
+                `DELETE FROM image_share_links
+                 USING user_images
+                 WHERE
+                     user_images.user_id = $1 AND
+                     image_share_links.token = $2 AND
+                     user_images.id = image_share_links.image_id`,
+                [userId, token]
+            );
+
+            return { existed: rowCount > 0 };
+        } finally {
+            client.release();
+        }
     }
 
     async getSharedImage(token: string): Promise<{
