@@ -1,4 +1,4 @@
-name: Server Side CI
+name: CI
 
 on:
   push:
@@ -9,10 +9,12 @@ on:
 defaults:
   run:
     shell: bash
-    working-directory: server
 
 jobs:
   frontend:
+    defaults:
+      run:
+        working-directory: frontend
     runs-on: macos-latest
     strategy:
       matrix:
@@ -27,6 +29,9 @@ jobs:
       - run: npx prettier --check src
       - run: npx eslint --ext .vue,.js src
   server:
+    defaults:
+      run:
+        working-directory: server
     runs-on: macos-latest
     strategy:
       matrix:
