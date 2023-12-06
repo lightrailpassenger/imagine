@@ -2,7 +2,12 @@
 import { useRouter } from "vue-router";
 
 defineEmits(["logout", "upload"]);
-defineProps(["shouldShowUpload"]);
+defineProps({
+    shouldShowUpload: {
+        type: Number,
+        required: true,
+    },
+});
 
 const $router = useRouter();
 const onVisitList = () => {

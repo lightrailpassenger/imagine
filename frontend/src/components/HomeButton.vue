@@ -3,7 +3,12 @@ import { ref } from "vue";
 
 const button = ref();
 
-const { style } = defineProps(["style"]);
+const { style } = defineProps({
+    style: {
+        type: Object,
+        required: true,
+    },
+});
 defineExpose({
     button,
 });

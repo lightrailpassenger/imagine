@@ -1,7 +1,16 @@
 <script setup>
 import { useRouter } from "vue-router";
 
-const { id } = defineProps(["id", "name"]);
+const { id } = defineProps({
+    id: {
+        type: String,
+        required: true,
+    },
+    name: {
+        type: String,
+        required: true,
+    },
+});
 
 const $router = useRouter();
 

@@ -9,6 +9,6 @@ const imageId = $route.params.imageId;
 
 <template>
     <main>
-        <Image :imageId="imageId" />
+        <Image :image-id="imageId" />
     </main>
 </template>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUpdated } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
 import Header from "./Header.vue";
@@ -44,15 +44,15 @@ onMounted(async () => {
 <template>
     <div v-if="imageList.length > 0" class="image-list">
         <Header
-            :shouldShowUpload="true"
+            :should-show-upload="true"
             @logout.prevent="onClickLogout"
             @upload.prevent="onUpload"
         />
         <ImageItem
             v-for="image in imageList"
             :id="image.id"
-            :name="image.name"
             :key="image.id"
+            :name="image.name"
         />
     </div>
 </template>

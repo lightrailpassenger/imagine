@@ -59,15 +59,15 @@ watch(submitting, async () => {
         <form @submit.prevent="onSubmitForm">
             <GoHomeButton />
             <legend>Log In</legend>
-            <input type="text" v-model="draftUsername" placeholder="Username" />
+            <input v-model="draftUsername" type="text" placeholder="Username" />
             <input
-                type="password"
                 v-model="draftPassword"
+                type="password"
                 placeholder="Password"
             />
             <div>
                 <button type="submit">Log In</button>
-                <span class="error" v-if="error">{{ error }}</span>
+                <span v-if="error" class="error">{{ error }}</span>
             </div>
         </form>
     </div>

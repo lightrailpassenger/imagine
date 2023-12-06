@@ -4,7 +4,12 @@ import { useRouter } from "vue-router";
 
 import Header from "./Header.vue";
 
-const { imageId } = defineProps(["imageId"]);
+const { imageId } = defineProps({
+    imageId: {
+        type: Object,
+        required: true,
+    },
+});
 
 const $router = useRouter();
 const onClickLogout = () => {
@@ -63,13 +68,13 @@ onUnmounted(() => {
 
 <template>
     <div class="image-view">
-        <Header :shouldShowUpload="false" @logout.prevent="onClickLogout" />
+        <Header :should-show-upload="false" @logout.prevent="onClickLogout" />
         <img alt="Secret image" :src="srcRef" />
         <div class="button-div">
-            <button @click.prevent="onShare" class="bottom-button">
+            <button class="bottom-button" @click.prevent="onShare">
                 Share
             </button>
-            <button @click.prevent="onDelete" class="bottom-button">
+            <button class="bottom-button" @click.prevent="onDelete">
                 Delete
             </button>
         </div>

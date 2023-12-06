@@ -15,7 +15,7 @@ onMounted(() => {
     }, 2000);
 });
 onUpdated(() => {
-    if (shouldShowButton) {
+    if (shouldShowButton.value) {
         const { width: loginButtonWidth } =
             loginButton.value.button.getBoundingClientRect();
         const { width: signupButtonWidth } =

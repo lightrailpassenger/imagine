@@ -58,7 +58,7 @@ watch(submitting, async () => {
         <Header @logout.prevent="onClickLogout" />
         <form @submit.prevent="onFormSubmit">
             <input type="file" @change.prevent="onFileChange" />
-            <input type="text" v-model="name" placeholder="Name" />
+            <input v-model="name" type="text" placeholder="Name" />
             <button type="submit">Upload</button>
             <span>{{ error }}</span>
         </form>
