@@ -25,6 +25,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: yarn
       - run: npx prettier --check src
+      - run: npx eslint --ext .vue,.js src
   server:
     runs-on: macos-latest
     strategy:
