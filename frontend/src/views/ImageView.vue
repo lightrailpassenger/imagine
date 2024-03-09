@@ -9,6 +9,6 @@ const imageId = $route.params.imageId;
 
 <template>
     <main>
-        <Image :image-id="imageId" />
+        <Image :image-id="imageId" v-bind="$attrs" />
     </main>
 </template>

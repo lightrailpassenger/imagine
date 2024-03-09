@@ -4,6 +4,8 @@ import { useRouter } from "vue-router";
 
 import GoHomeButton from "./GoHomeButton.vue";
 
+const emit = defineEmits(["login"]);
+
 const draftUsername = ref("");
 const draftPassword = ref("");
 
@@ -37,7 +39,7 @@ watch(submitting, async () => {
 
     if (result.ok) {
         const { token } = await result.json();
-        window.accessToken = token;
+        emit("login", token);
 
         error.value = null;
         $router.push({ path: "/list" });

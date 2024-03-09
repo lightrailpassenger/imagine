@@ -4,6 +4,6 @@ import ImageList from "../components/ImageList.vue";
 
 <template>
     <main>
-        <ImageList />
+        <ImageList v-bind="$attrs" />
     </main>
 </template>

@@ -1,19 +1,24 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, toRaw } from "vue";
 import { useRouter } from "vue-router";
 
 import Header from "./Header.vue";
 
-const { imageId } = defineProps({
-    imageId: {
+const { credentialsHeader, imageId } = defineProps({
+    credentialsHeader: {
         type: Object,
         required: true,
     },
+    imageId: {
+        type: String,
+        required: true,
+    },
 });
+const emit = defineEmits(["login"]);
 
 const $router = useRouter();
 const onClickLogout = () => {
-    window.accessToken = null;
+    emit("login", null);
     $router.push({ path: "/" });
 };
 const onDelete = () => {
@@ -29,9 +34,7 @@ const onDeleteDialogClose = (event) => {
             }/user-images/${encodeURIComponent(imageId)}`,
             {
                 method: "delete",
-                headers: {
-                    Authorization: `Bearer ${window.accessToken}`,
-                },
+                headers: toRaw(credentialsHeader),
             }
         ).then(() => {
             $router.push({ path: "/list" });
@@ -54,7 +57,7 @@ const onCreateShareLinkDialogClose = async (event) => {
             {
                 method: "post",
                 headers: {
-                    Authorization: `Bearer ${window.accessToken}`,
+                    ...toRaw(credentialsHeader),
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ limit: createShareLinkLimit.value }),
@@ -85,9 +88,7 @@ onMounted(() => {
     async function fetchImage() {
         const res = await fetch(srcUrl, {
             method: "get",
-            headers: {
-                Authorization: `Bearer ${window.accessToken}`,
-            },
+            headers: toRaw(credentialsHeader),
         });
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);

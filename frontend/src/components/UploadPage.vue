@@ -1,9 +1,16 @@
 <script setup>
-import { ref, toValue, watch } from "vue";
+import { ref, toRaw, toValue, watch } from "vue";
 import { useRouter } from "vue-router";
 
 import Header from "./Header.vue";
 
+const { credentialsHeader } = defineProps({
+    credentialsHeader: {
+        type: Object,
+        required: true,
+    },
+});
+const emit = defineEmits(["login"]);
 const submitting = ref(null);
 const name = ref(null);
 const file = ref(null);
@@ -16,7 +23,7 @@ const onFileChange = (event) => {
 };
 
 const onClickLogout = () => {
-    window.accessToken = null;
+    emit("login", null);
     $router.push({ path: "/" });
 };
 
@@ -35,9 +42,7 @@ watch(submitting, async () => {
         {
             method: "post",
             body: toValue(submitting),
-            headers: {
-                Authorization: `Bearer ${window.accessToken}`,
-            },
+            headers: toRaw(credentialsHeader),
         }
     );
 

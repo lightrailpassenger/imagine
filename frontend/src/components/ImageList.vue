@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, toRaw } from "vue";
 import { useRouter } from "vue-router";
 
 import Header from "./Header.vue";
@@ -9,8 +9,16 @@ const imageList = ref([]);
 
 const $router = useRouter();
 
+const { credentialsHeader } = defineProps({
+    credentialsHeader: {
+        type: Object,
+        required: true,
+    },
+});
+
+const emit = defineEmits(["login"]);
 const onClickLogout = () => {
-    window.accessToken = null;
+    emit("login", null);
     $router.push({ path: "/" });
 };
 
@@ -23,9 +31,7 @@ onMounted(async () => {
         `${import.meta.env.VITE_ENDPOINT_BASE_URL}/user-images`,
         {
             method: "get",
-            headers: {
-                Authorization: `Bearer ${window.accessToken}`,
-            },
+            headers: toRaw(credentialsHeader),
         }
     );
 

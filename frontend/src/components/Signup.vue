@@ -1,6 +1,8 @@
 <script setup>
 import { ref, toValue, watch } from "vue";
 
+const emit = defineEmits(["login"]);
+
 import GoHomeButton from "./GoHomeButton.vue";
 
 const draftUsername = ref("");
@@ -38,8 +40,8 @@ watch(submitting, async () => {
 
     if (result.ok) {
         const { token } = await result.json();
-        window.accessToken = token;
 
+        emit("login", token);
         error.value = null;
     } else {
         try {
