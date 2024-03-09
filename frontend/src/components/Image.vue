@@ -39,6 +39,43 @@ const onDeleteDialogClose = (event) => {
     }
 };
 
+const createShareLinkLimit = ref(5);
+const onShare = () => {
+    const dialog = document.getElementById("create-share-link-dialog");
+    dialog.showModal();
+};
+
+const onCreateShareLinkDialogClose = async (event) => {
+    if (event.target.returnValue === "share") {
+        const res = await fetch(
+            `${
+                import.meta.env.VITE_ENDPOINT_BASE_URL
+            }/user-images/${encodeURIComponent(imageId)}/share-link`,
+            {
+                method: "post",
+                headers: {
+                    Authorization: `Bearer ${window.accessToken}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ limit: createShareLinkLimit.value }),
+            }
+        );
+
+        if (res.ok) {
+            const { token } = await res.json();
+            const fullURL = `${
+                new URL(window.location.href).origin
+            }/guest/${token}`;
+
+            await window.navigator.clipboard.writeText(fullURL);
+
+            document.getElementById("shared-dialog").showModal();
+        } else {
+            // TODO: Error state
+        }
+    }
+};
+
 const srcUrl = `${
     import.meta.env.VITE_ENDPOINT_BASE_URL
 }/user-images/${encodeURIComponent(imageId)}`;
@@ -85,6 +122,34 @@ onUnmounted(() => {
                 <button type="submit" value="yes">Yes</button>
             </form>
         </dialog>
+        <dialog
+            id="create-share-link-dialog"
+            @close="onCreateShareLinkDialogClose"
+        >
+            <form method="dialog">
+                <p>
+                    Limit:
+                    <input
+                        class="limit-input"
+                        type="number"
+                        min="1"
+                        max="10"
+                        step="1"
+                        :value="createShareLinkLimit"
+                    />
+                </p>
+                <button type="submit" value="cancel">Cancel</button>
+                <button type="submit" value="share">Share</button>
+            </form>
+        </dialog>
+        <dialog id="shared-dialog">
+            <form>
+                <p>Shared. The URL has been copied to the clipboard.</p>
+                <button type="submit" formmethod="dialog" value="close">
+                    Done
+                </button>
+            </form>
+        </dialog>
     </div>
 </template>
 
@@ -117,6 +182,11 @@ img {
     background: transparent;
     border: 1px solid black;
     border-radius: 2px;
+}
+
+.limit-input {
+    width: 100px;
+    margin-left: 20px;
 }
 
 form {

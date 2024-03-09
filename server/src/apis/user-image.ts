@@ -462,7 +462,7 @@ function createRouter(
                 const reqSchema: ObjectSchema<{
                     limit: number;
                 }> = joi.object({
-                    limit: joi.number().integer().positive(),
+                    limit: joi.number().integer().positive().required(),
                 });
 
                 const { id } = req.params;
