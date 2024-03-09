@@ -63,6 +63,7 @@ watch(submitting, async () => {
             <input
                 v-model="draftPassword"
                 type="password"
+                autocomplete="current-password"
                 placeholder="Password"
             />
             <div>
