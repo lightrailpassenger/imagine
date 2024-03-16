@@ -4,6 +4,6 @@ import UploadPage from "../components/UploadPage.vue";
 
 <template>
     <main>
-        <UploadPage />
+        <UploadPage v-bind="$attrs" />
     </main>
 </template>
