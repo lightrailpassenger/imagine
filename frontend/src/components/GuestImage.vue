@@ -47,7 +47,7 @@ const onImageClose = () => {
     <div class="guest-image-view">
         <h1>View Image</h1>
         <button class="main" @click="onContinue">Continue</button>
-        <dialog class="image-dialog" ref="imageDialog" @close="onImageClose">
+        <dialog ref="imageDialog" class="image-dialog" @close="onImageClose">
             <div class="guest-image-pane">
                 <img :src="imgSrc" />
                 <form>
@@ -119,6 +119,6 @@ button {
 }
 
 button.main {
-    font-size: 18px;
+    font-size: 22px;
 }
 </style>

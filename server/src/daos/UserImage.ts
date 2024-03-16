@@ -101,7 +101,18 @@ class UserImage {
                 [userId]
             );
 
-            return rows.map(({ id, name }) => ({ id, name }));
+            return rows.map(({ id, name }) => {
+                const ext = extname(name);
+
+                if (name.endsWith(ext)) {
+                    return {
+                        name: name.substring(0, name.length - ext.length),
+                        id,
+                    };
+                }
+
+                return { id, name };
+            });
         } finally {
             client.release();
         }

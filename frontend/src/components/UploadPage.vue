@@ -4,6 +4,8 @@ import { useRouter } from "vue-router";
 
 import Header from "./Header.vue";
 
+import { getNameWithoutExtension } from "../utils/FileUtil.js";
+
 const { credentialsHeader } = defineProps({
     credentialsHeader: {
         type: Object,
@@ -31,7 +33,10 @@ const onFormSubmit = () => {
     const formData = new FormData();
 
     formData.append("image", toValue(file));
-    formData.append("name", name.value || file.value.name);
+    formData.append(
+        "name",
+        name.value || getNameWithoutExtension(file.value.name)
+    );
 
     submitting.value = formData;
 };

@@ -29,7 +29,7 @@ const onView = () => {
 <style scoped>
 .item {
     width: 100%;
-    max-width: 680px;
+    max-width: 580px;
     display: flex;
     font-size: 20px;
     background: white;
@@ -43,6 +43,8 @@ const onView = () => {
 .name {
     flex: 1 1 auto;
     padding-left: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 button {

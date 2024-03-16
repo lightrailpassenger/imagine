@@ -20,11 +20,11 @@ const onVisitList = () => {
 <template>
     <div class="title-container">
         <a href="/list" @click.prevent="onVisitList">Imagine</a>
-        <span class="space" />
+        <div class="space" />
         <button v-if="shouldShowUpload" @click="$emit('upload', $event)">
             Upload
         </button>
-        <button @click="$emit('logout', $event)">Log out</button>
+        <button class="logout" @click="$emit('logout', $event)">Log out</button>
     </div>
 </template>
 
@@ -32,11 +32,13 @@ const onVisitList = () => {
 .title-container {
     display: flex;
     flex-direction: row;
-    width: 680px;
+    width: 100%;
+    max-width: 680px;
     align-items: center;
 }
 
 a {
+    margin-left: 5px;
     flex: 0 0 auto;
     font-size: 40px;
     color: black;
@@ -50,7 +52,7 @@ a:link {
 }
 
 .space {
-    flex: 1 1 0;
+    flex: 1 1 400px;
 }
 
 button {
@@ -60,5 +62,9 @@ button {
     font-size: 18px;
     border-radius: 2px;
     margin-left: 3px;
+}
+
+button.logout {
+    margin-right: 5px;
 }
 </style>
