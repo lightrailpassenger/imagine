@@ -32,7 +32,7 @@ const onContinue = async () => {
     } else if (res.status === 404) {
         notFoundDialog.value.showModal();
     } else {
-        error.value.showModal();
+        errorDialog.value.showModal();
     }
 };
 const onImageClose = () => {
