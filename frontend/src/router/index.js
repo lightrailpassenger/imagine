@@ -35,6 +35,21 @@ const router = createRouter({
             component: () => import("../views/ImageView.vue"),
         },
         {
+            path: "/guest",
+            name: "guest-view",
+            component: () => import("../views/GuestView.vue"),
+        },
+        {
+            path: "/guest/:token",
+            name: "guest-view-entrypoint",
+            redirect: (to) => ({
+                name: "guest-view",
+                state: {
+                    token: to.params.token,
+                },
+            }),
+        },
+        {
             path: "/about",
             name: "about",
             // route level code-splitting

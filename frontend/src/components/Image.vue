@@ -68,7 +68,7 @@ const onCreateShareLinkDialogClose = async (event) => {
             const { token } = await res.json();
             const fullURL = `${
                 new URL(window.location.href).origin
-            }/guest/${token}`;
+            }/guest/${encodeURIComponent(token)}`;
 
             await window.navigator.clipboard.writeText(fullURL);
 
@@ -136,7 +136,7 @@ onUnmounted(() => {
                         min="1"
                         max="10"
                         step="1"
-                        :value="createShareLinkLimit"
+                        v-model="createShareLinkLimit"
                     />
                 </p>
                 <button type="submit" value="cancel">Cancel</button>
