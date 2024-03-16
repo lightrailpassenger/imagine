@@ -131,12 +131,12 @@ onUnmounted(() => {
                 <p>
                     Limit:
                     <input
+                        v-model="createShareLinkLimit"
                         class="limit-input"
                         type="number"
                         min="1"
                         max="10"
                         step="1"
-                        v-model="createShareLinkLimit"
                     />
                 </p>
                 <button type="submit" value="cancel">Cancel</button>

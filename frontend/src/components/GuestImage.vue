@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 
-const GUEST_IMAGE_TIMEOUT = 30_000;
+const GUEST_IMAGE_TIMEOUT = 30000; // TODO: Introduce numeric separate support to `eslint`
 const { token } = window.history.state;
 const imageDialog = ref();
 const notFoundDialog = ref();
