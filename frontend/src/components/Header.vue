@@ -4,8 +4,8 @@ import { useRouter } from "vue-router";
 defineEmits(["logout", "upload"]);
 defineProps({
     shouldShowUpload: {
-        type: Number,
-        required: true,
+        type: Boolean,
+        required: false,
     },
 });
 
