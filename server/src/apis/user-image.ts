@@ -180,6 +180,7 @@ function createRouter(
 
                 res.set({
                     "Content-Type": getContentTypeFromName(name),
+                    "X-Image-Name": name,
                 });
 
                 return res.send(image);

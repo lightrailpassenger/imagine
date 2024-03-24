@@ -15,7 +15,12 @@ const { id } = defineProps({
 const $router = useRouter();
 
 const onView = () => {
-    $router.push({ path: `/view/${encodeURIComponent(id)}` });
+    $router.push({
+        state: {
+            name,
+        },
+        path: `/view/${encodeURIComponent(id)}`,
+    });
 };
 </script>
 

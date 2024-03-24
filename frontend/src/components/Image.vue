@@ -4,6 +4,8 @@ import { useRouter } from "vue-router";
 
 import Header from "./Header.vue";
 
+import { getNameWithoutExtension } from "../utils/FileUtil";
+
 const { credentialsHeader, imageId } = defineProps({
     credentialsHeader: {
         type: Object,
@@ -16,16 +18,47 @@ const { credentialsHeader, imageId } = defineProps({
 });
 const emit = defineEmits(["login"]);
 
+const name = ref();
+const draftName = ref();
 const $router = useRouter();
 const onClickLogout = () => {
     emit("login", null);
     $router.push({ path: "/" });
+};
+const onRename = () => {
+    draftName.value = name.value;
+
+    const dialog = document.getElementById("rename-dialog");
+    dialog.showModal();
 };
 const onDelete = () => {
     const dialog = document.getElementById("delete-dialog");
     dialog.showModal();
 };
 
+const onRenameDialogCancel = () => {
+    const dialog = document.getElementById("rename-dialog");
+    dialog.close();
+};
+
+const onRenameDialogClose = async (event) => {
+    if (draftName.value !== name.value) {
+        await fetch(
+            `${
+                import.meta.env.VITE_ENDPOINT_BASE_URL
+            }/user-images/${encodeURIComponent(imageId)}`,
+            {
+                method: "PATCH", // https://github.com/nodejs/help/issues/2184
+                headers: {
+                    ...toRaw(credentialsHeader),
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ name: draftName.value }),
+            }
+        );
+        name.value = draftName.value;
+    }
+};
 const onDeleteDialogClose = (event) => {
     if (event.target.returnValue === "yes") {
         fetch(
@@ -93,9 +126,11 @@ onMounted(() => {
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
 
+        name.value = getNameWithoutExtension(res.headers.get("X-Image-Name"));
         srcRef.value = url;
     }
 
+    // TODO: add a loading state.
     fetchImage();
 });
 
@@ -107,10 +142,13 @@ onUnmounted(() => {
 <template>
     <div class="image-view">
         <Header :should-show-upload="false" @logout.prevent="onClickLogout" />
-        <img alt="Secret image" :src="srcRef" />
+        <img :alt="`Secret image - ${name}`" :src="srcRef" />
         <div class="button-div">
             <button class="bottom-button" @click.prevent="onShare">
                 Share
+            </button>
+            <button class="bottom-button" @click.prevent="onRename">
+                Rename
             </button>
             <button class="bottom-button" @click.prevent="onDelete">
                 Delete
@@ -141,6 +179,18 @@ onUnmounted(() => {
                 </p>
                 <button type="submit" value="cancel">Cancel</button>
                 <button type="submit" value="share">Share</button>
+            </form>
+        </dialog>
+        <dialog id="rename-dialog">
+            <form method="dialog" @submit="onRenameDialogClose">
+                <p>
+                    New name:
+                    <input type="text" v-model="draftName" />
+                </p>
+                <button type="button" @click.prevent="onRenameDialogCancel">
+                    Cancel
+                </button>
+                <button type="submit">Rename</button>
             </form>
         </dialog>
         <dialog id="shared-dialog">
@@ -177,8 +227,9 @@ img {
 }
 
 .bottom-button {
+    flex: 0 0 auto;
     margin: 3px;
-    width: 50px;
+    width: 60px;
     height: 25px;
     background: transparent;
     border: 1px solid black;
