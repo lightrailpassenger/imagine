@@ -49,7 +49,7 @@ const onImageClose = () => {
         <button class="main" @click="onContinue">Continue</button>
         <dialog ref="imageDialog" class="image-dialog" @close="onImageClose">
             <div class="guest-image-pane">
-                <img :src="imgSrc" />
+                <img :src="imgSrc" @contextmenu.prevent="" />
                 <form>
                     <button class="guest-image-pane-close" formmethod="dialog">
                         Close
