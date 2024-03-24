@@ -50,7 +50,7 @@ const onRenameDialogCancel = () => {
     dialog.close();
 };
 
-const onRenameDialogClose = async (event) => {
+const onRenameDialogClose = async () => {
     if (draftName.value !== name.value) {
         await fetchWithLogoutCatch(
             `${
@@ -194,7 +194,7 @@ onUnmounted(() => {
             <form method="dialog" @submit="onRenameDialogClose">
                 <p>
                     New name:
-                    <input type="text" v-model="draftName" />
+                    <input v-model="draftName" type="text" />
                 </p>
                 <button type="button" @click.prevent="onRenameDialogCancel">
                     Cancel
