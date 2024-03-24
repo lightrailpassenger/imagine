@@ -23,7 +23,16 @@ const draftName = ref();
 const $router = useRouter();
 const onClickLogout = () => {
     emit("login", null);
-    $router.push({ path: "/" });
+    $router.push({ path: "/login" });
+};
+const fetchWithLogoutCatch = async (...params) => {
+    const res = await fetch(...params);
+
+    if (res.status === 401) {
+        onClickLogout();
+    }
+
+    return res;
 };
 const onRename = () => {
     draftName.value = name.value;
@@ -43,7 +52,7 @@ const onRenameDialogCancel = () => {
 
 const onRenameDialogClose = async (event) => {
     if (draftName.value !== name.value) {
-        await fetch(
+        await fetchWithLogoutCatch(
             `${
                 import.meta.env.VITE_ENDPOINT_BASE_URL
             }/user-images/${encodeURIComponent(imageId)}`,
@@ -61,7 +70,7 @@ const onRenameDialogClose = async (event) => {
 };
 const onDeleteDialogClose = (event) => {
     if (event.target.returnValue === "yes") {
-        fetch(
+        fetchWithLogoutCatch(
             `${
                 import.meta.env.VITE_ENDPOINT_BASE_URL
             }/user-images/${encodeURIComponent(imageId)}`,
@@ -83,7 +92,7 @@ const onShare = () => {
 
 const onCreateShareLinkDialogClose = async (event) => {
     if (event.target.returnValue === "share") {
-        const res = await fetch(
+        const res = await fetchWithLogoutCatch(
             `${
                 import.meta.env.VITE_ENDPOINT_BASE_URL
             }/user-images/${encodeURIComponent(imageId)}/share-link`,
@@ -119,7 +128,7 @@ const srcRef = ref();
 
 onMounted(() => {
     async function fetchImage() {
-        const res = await fetch(srcUrl, {
+        const res = await fetchWithLogoutCatch(srcUrl, {
             method: "get",
             headers: toRaw(credentialsHeader),
         });
