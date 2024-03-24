@@ -189,6 +189,30 @@ class UserImage {
         }
     }
 
+    async getSharedLinksByImageId(imageId: string): Promise<
+        {
+            token: string;
+            used: number;
+            total: number;
+        }[]
+    > {
+        const { rows } = await this.#pool.query(
+            `SELECT
+                token,
+                used_limit AS used,
+                total_limit AS total
+            FROM user_images
+            INNER JOIN image_share_links
+            ON user_images.id = image_share_links.image_id
+            WHERE
+                user_images.id = $1 AND
+                used_limit < total_limit`,
+            [imageId]
+        );
+
+        return rows;
+    }
+
     async deleteShareLink(
         token: string,
         userId: string
