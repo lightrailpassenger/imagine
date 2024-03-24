@@ -5,7 +5,8 @@ module.exports = {
         await queryInterface.sequelize.query(
             `CREATE TABLE visit_records (
                 link_token TEXT NOT NULL REFERENCES image_share_links(token) ON DELETE CASCADE,
-                user_agent TEXT NOT NULL
+                user_agent TEXT NOT NULL,
+                accessed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             )`
         );
         await queryInterface.sequelize.query(

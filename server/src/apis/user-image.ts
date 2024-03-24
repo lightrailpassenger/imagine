@@ -366,7 +366,11 @@ function createRouter(
                 });
             }
 
-            const imageInfo = await userImageOperations.getSharedImage(token);
+            const userAgent = req.get("User-Agent").substring(1024);
+            const imageInfo = await userImageOperations.getSharedImage(
+                token,
+                userAgent
+            );
 
             if (!imageInfo) {
                 return res.status(404).send({

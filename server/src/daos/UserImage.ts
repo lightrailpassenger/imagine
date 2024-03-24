@@ -236,13 +236,17 @@ class UserImage {
         }
     }
 
-    async getSharedImage(token: string): Promise<{
+    async getSharedImage(
+        token: string,
+        userAgent?: string
+    ): Promise<{
         name: string;
         image: Buffer;
     } | null> {
         const client = await this.#pool.connect();
 
         try {
+            await client.query("BEGIN");
             const { rows } = await client.query(
                 `UPDATE image_share_links
                  SET used_limit = used_limit + 1
@@ -253,8 +257,15 @@ class UserImage {
             const row = rows[0];
 
             if (!row) {
+                await client.query("ROLLBACK");
                 return null;
             }
+
+            await client.query(
+                `INSERT INTO visit_records (link_token, user_agent)
+                VALUES ($1, $2)`,
+                [token, userAgent ?? ""]
+            );
 
             const { imageId } = row;
             const {
@@ -267,12 +278,18 @@ class UserImage {
             );
 
             if (imageRow) {
+                await client.query("COMMIT");
+
                 const { image, name } = imageRow;
 
                 return { image, name };
             }
 
+            await client.query("ROLLBACK");
             return null;
+        } catch (err) {
+            await client.query("ROLLBACK");
+            throw err;
         } finally {
             client.release();
         }
