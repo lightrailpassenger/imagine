@@ -3,6 +3,7 @@ import multer from "multer";
 import { fileTypeFromBuffer } from "file-type";
 
 import { Router } from "express";
+import useragent from "express-useragent";
 
 import createLoginMiddleware from "../middlewares/createLoginMiddleware.js";
 
@@ -366,7 +367,7 @@ function createRouter(
                 });
             }
 
-            const userAgent = req.get("User-Agent")?.substring(1024);
+            const userAgent = req.get("User-Agent")?.substring(0, 1024);
             const imageInfo = await userImageOperations.getSharedImage(
                 token,
                 userAgent
@@ -432,6 +433,99 @@ function createRouter(
                 );
 
                 return res.status(200).send({ info });
+            } catch (err) {
+                console.error(err);
+
+                return res.status(500).send({
+                    err: "Internal Server Error",
+                });
+            }
+        }
+    );
+
+    router.get(
+        "/share-links/:token/history",
+        createLoginMiddleware(loginTokenHandler),
+        async (req, res) => {
+            try {
+                const { isLoginSuccessful, clientSideId } = req as typeof req &
+                    ReqType;
+
+                if (!isLoginSuccessful) {
+                    return res.status(401).send({
+                        err: "Login Required",
+                    });
+                }
+
+                const { token } = req.params;
+
+                if (!token || typeof token !== "string") {
+                    return res.status(400).send({
+                        err: "Bad Request",
+                    });
+                }
+
+                const userId = await userOperations.getUserIdFromClientSideId(
+                    clientSideId
+                );
+
+                if (!userId) {
+                    return res.status(401).send({
+                        err: "Login Required",
+                    });
+                }
+
+                const ownerUserId =
+                    await userImageOperations.getImageOwnerUserIdByShareLinkToken(
+                        token
+                    );
+
+                if (ownerUserId !== userId) {
+                    return res.status(404).send({
+                        err: "Not Found", // Can be no permission
+                    });
+                }
+
+                const records =
+                    await userImageOperations.getVisitRecordsByImageShareLinkToken(
+                        token
+                    );
+                const uniqueUserAgents = new Set(
+                    records.map((record) => record.userAgent)
+                );
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- to be parsed
+                const convertParsedUserAgentToString = (
+                    parsed: any
+                ): string => {
+                    const { browser, version } = parsed;
+
+                    if (
+                        typeof browser === "string" &&
+                        typeof version === "string" &&
+                        browser !== "unknown" &&
+                        version !== "unknown"
+                    ) {
+                        return `${browser} ${version}`;
+                    }
+
+                    return "Unknown";
+                };
+                const browserMap = new Map(
+                    Array.from(uniqueUserAgents, (userAgent) => [
+                        userAgent,
+                        convertParsedUserAgentToString(
+                            useragent.parse(userAgent)
+                        ),
+                    ])
+                );
+
+                return res.status(200).send({
+                    records: records.map((record) => ({
+                        visitedAt: record.visitedAt,
+                        visitor: browserMap.get(record.userAgent),
+                    })),
+                });
             } catch (err) {
                 console.error(err);
 

@@ -213,6 +213,39 @@ class UserImage {
         return rows;
     }
 
+    async getVisitRecordsByImageShareLinkToken(
+        token: string
+    ): Promise<{ userAgent: string; visitedAt: Date }[]> {
+        const { rows } = await this.#pool.query(
+            `SELECT
+                 user_agent AS "userAgent",
+                 accessed_at AS "visitedAt"
+             FROM visit_records
+             WHERE link_token = $1`,
+            [token]
+        );
+
+        return rows;
+    }
+
+    async getImageOwnerUserIdByShareLinkToken(
+        token: string | null
+    ): Promise<string> {
+        const {
+            rows: [row],
+        } = await this.#pool.query(
+            `SELECT
+                 user_id AS "userId"
+             FROM user_images
+             INNER JOIN image_share_links
+             ON user_images.id = image_share_links.image_id
+             WHERE image_share_links.token = $1`,
+            [token]
+        );
+
+        return row?.userId ?? null;
+    }
+
     async deleteShareLink(
         token: string,
         userId: string
