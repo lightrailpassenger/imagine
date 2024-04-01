@@ -86,7 +86,7 @@ watch(
                     </span>
                 </li>
             </ul>
-            <div class="no-link-created-div" v-else>
+            <div v-else class="no-link-created-div">
                 <span>This image hasn't been shared.</span>
             </div>
             <button class="close-button" type="button" @click.prevent="close">
