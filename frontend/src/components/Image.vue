@@ -34,15 +34,18 @@ const fetchWithLogoutCatch = async (...params) => {
 
     return res;
 };
+
+const renameDialog = ref();
+const deleteDialog = ref();
+const sharedDialog = ref();
+const createShareLinkDialog = ref();
+
 const onRename = () => {
     draftName.value = name.value;
-
-    const dialog = document.getElementById("rename-dialog");
-    dialog.showModal();
+    renameDialog.value?.showModal();
 };
 const onDelete = () => {
-    const dialog = document.getElementById("delete-dialog");
-    dialog.showModal();
+    deleteDialog.value?.showModal();
 };
 
 const onRenameDialogCancel = () => {
@@ -86,8 +89,7 @@ const onDeleteDialogClose = (event) => {
 
 const createShareLinkLimit = ref(5);
 const onShare = () => {
-    const dialog = document.getElementById("create-share-link-dialog");
-    dialog.showModal();
+    createShareLinkDialog.value?.showModal();
 };
 
 const onCreateShareLinkDialogClose = async (event) => {
@@ -114,7 +116,7 @@ const onCreateShareLinkDialogClose = async (event) => {
 
             await window.navigator.clipboard.writeText(fullURL);
 
-            document.getElementById("shared-dialog").showModal();
+            sharedDialog.value.showModal();
         } else {
             // TODO: Error state
         }
@@ -163,7 +165,7 @@ onUnmounted(() => {
                 Delete
             </button>
         </div>
-        <dialog id="delete-dialog" @close="onDeleteDialogClose">
+        <dialog ref="deleteDialog" @close="onDeleteDialogClose">
             <form method="dialog">
                 <p>Do you want to delete the image? This cannot be undone.</p>
                 <button type="submit" value="no">No</button>
@@ -171,7 +173,7 @@ onUnmounted(() => {
             </form>
         </dialog>
         <dialog
-            id="create-share-link-dialog"
+            ref="createShareLinkDialog"
             @close="onCreateShareLinkDialogClose"
         >
             <form method="dialog">
@@ -190,7 +192,7 @@ onUnmounted(() => {
                 <button type="submit" value="share">Share</button>
             </form>
         </dialog>
-        <dialog id="rename-dialog">
+        <dialog ref="renameDialog">
             <form method="dialog" @submit="onRenameDialogClose">
                 <p>
                     New name:
@@ -202,7 +204,7 @@ onUnmounted(() => {
                 <button type="submit">Rename</button>
             </form>
         </dialog>
-        <dialog id="shared-dialog">
+        <dialog ref="sharedDialog">
             <form>
                 <p>Shared. The URL has been copied to the clipboard.</p>
                 <button type="submit" formmethod="dialog" value="close">
