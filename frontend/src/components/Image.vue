@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted, toRaw } from "vue";
 import { useRouter } from "vue-router";
 
 import Header from "./Header.vue";
+import ShareLinkDialog from "./ShareLinkDialog.vue";
 
 import { getNameWithoutExtension } from "../utils/FileUtil";
 
@@ -39,18 +40,23 @@ const renameDialog = ref();
 const deleteDialog = ref();
 const sharedDialog = ref();
 const createShareLinkDialog = ref();
+const manageDialog = ref();
 
 const onRename = () => {
     draftName.value = name.value;
     renameDialog.value?.showModal();
 };
+const onManage = () => {
+    manageDialog.value?.showModal();
+};
 const onDelete = () => {
     deleteDialog.value?.showModal();
 };
-
+const onShareLinkDialogClose = () => {
+    manageDialog.value.close();
+};
 const onRenameDialogCancel = () => {
-    const dialog = document.getElementById("rename-dialog");
-    dialog.close();
+    renameDialog.value.close();
 };
 
 const onRenameDialogClose = async () => {
@@ -158,6 +164,9 @@ onUnmounted(() => {
             <button class="bottom-button" @click.prevent="onShare">
                 Share
             </button>
+            <button class="bottom-button" @click.prevent="onManage">
+                Manage
+            </button>
             <button class="bottom-button" @click.prevent="onRename">
                 Rename
             </button>
@@ -212,6 +221,12 @@ onUnmounted(() => {
                 </button>
             </form>
         </dialog>
+        <ShareLinkDialog
+            ref="manageDialog"
+            :image-id="imageId"
+            :credentials-header="credentialsHeader"
+            @close="onShareLinkDialogClose"
+        />
     </div>
 </template>
 
