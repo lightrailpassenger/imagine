@@ -206,7 +206,8 @@ class UserImage {
             ON user_images.id = image_share_links.image_id
             WHERE
                 user_images.id = $1 AND
-                used_limit < total_limit`,
+                used_limit < total_limit
+            ORDER BY image_share_links.created_at`,
             [imageId]
         );
 
@@ -221,7 +222,8 @@ class UserImage {
                  user_agent AS "userAgent",
                  accessed_at AS "visitedAt"
              FROM visit_records
-             WHERE link_token = $1`,
+             WHERE link_token = $1
+             ORDER BY accessed_at`,
             [token]
         );
 
