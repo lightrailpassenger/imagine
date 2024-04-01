@@ -1,5 +1,5 @@
 <script setup>
-import { ref, toRaw, onMounted, onUnmounted, watch } from "vue";
+import { ref, computed, toRaw, onMounted, onUnmounted, watch } from "vue";
 
 const { credentialsHeader, imageId } = defineProps({
     credentialsHeader: {
@@ -26,7 +26,8 @@ defineExpose({
     close,
 });
 
-const links = ref();
+const links = ref([]);
+const hasLink = computed(() => links.value.length > 0);
 const fetchShareLinks = async (fetchingImageId, signal) => {
     const res = await fetch(
         `${
@@ -75,7 +76,7 @@ watch(
     <dialog ref="dialog" @close="$emit('close', $event)">
         <div class="main">
             <p class="title">Existing share links:</p>
-            <ul v-if="links">
+            <ul v-if="hasLink">
                 <li v-for="link in links" :key="link.url">
                     <span class="url">
                         {{ link.url }}
@@ -85,6 +86,9 @@ watch(
                     </span>
                 </li>
             </ul>
+            <div class="no-link-created-div" v-else>
+                <span>This image hasn't been shared.</span>
+            </div>
             <button class="close-button" type="button" @click.prevent="close">
                 Close
             </button>
@@ -101,6 +105,13 @@ dialog {
     height: 100%;
     display: flex;
     flex-direction: column;
+}
+
+.no-link-created-div {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 ul {
