@@ -122,6 +122,7 @@ const onCreateShareLinkDialogClose = async (event) => {
 
             await window.navigator.clipboard.writeText(fullURL);
 
+            manageDialog.value.fetchShareLinks();
             sharedDialog.value.showModal();
         } else {
             // TODO: Error state

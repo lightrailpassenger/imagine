@@ -21,11 +21,6 @@ const close = () => {
     dialog.value.close();
 };
 
-defineExpose({
-    showModal,
-    close,
-});
-
 const links = ref([]);
 const hasLink = computed(() => links.value.length > 0);
 const fetchShareLinks = async (fetchingImageId, signal) => {
@@ -70,6 +65,12 @@ watch(
         fetchShareLinks(imageId, ac.value.signal);
     }
 );
+
+defineExpose({
+    showModal,
+    close,
+    fetchShareLinks,
+});
 </script>
 
 <template>
