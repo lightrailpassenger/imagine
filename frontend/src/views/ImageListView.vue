@@ -1,5 +1,9 @@
 <script setup>
 import ImageList from "../components/ImageList.vue";
+
+defineOptions({
+    inheritAttrs: false,
+});
 </script>
 
 <template>

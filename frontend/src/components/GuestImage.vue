@@ -1,6 +1,10 @@
 <script setup>
 import { ref } from "vue";
 
+defineOptions({
+    inheritAttrs: false,
+});
+
 const GUEST_IMAGE_TIMEOUT = 30000; // TODO: Introduce numeric separate support to `eslint`
 const { token } = window.history.state;
 const imageDialog = ref();

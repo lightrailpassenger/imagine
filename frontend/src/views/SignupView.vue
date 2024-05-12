@@ -1,5 +1,9 @@
 <script setup>
 import Signup from "../components/Signup.vue";
+
+defineOptions({
+    inheritAttrs: false,
+});
 </script>
 
 <template>

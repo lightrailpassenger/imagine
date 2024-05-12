@@ -4,6 +4,10 @@ import { useRouter } from "vue-router";
 
 import GoHomeButton from "./GoHomeButton.vue";
 
+defineOptions({
+    inheritAttrs: false,
+});
+
 const emit = defineEmits(["login"]);
 
 const draftUsername = ref("");

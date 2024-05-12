@@ -1,5 +1,9 @@
 <script setup>
 import Login from "../components/Login.vue";
+
+defineOptions({
+    inheritAttrs: false,
+});
 </script>
 
 <template>
