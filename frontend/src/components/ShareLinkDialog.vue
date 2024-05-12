@@ -21,6 +21,14 @@ const close = () => {
     dialog.value.close();
 };
 
+const deleteShareLinkDialog = ref();
+const onDeleteShareLinkDialogShow = () => {
+    deleteShareLinkDialog.value.showModal();
+};
+const onDeleteShareLinkDialogClose = () => {
+    deleteShareLinkDialog.value.close();
+};
+
 const links = ref([]);
 const hasLink = computed(() => links.value.length > 0);
 const fetchShareLinks = async (fetchingImageId, signal) => {
@@ -40,6 +48,7 @@ const fetchShareLinks = async (fetchingImageId, signal) => {
         links.value = info.map(({ token, used, total }) => ({
             used,
             total,
+            token,
             url: `${
                 new URL(window.location.href).origin
             }/guest/${encodeURIComponent(token)}`,
@@ -66,6 +75,56 @@ watch(
     }
 );
 
+const selectedMap = ref(new Map());
+const isChecked = (token) => {
+    return Boolean(selectedMap.value.get(token));
+};
+const toggle = (token) => {
+    const old = selectedMap.value.get(token);
+    selectedMap.value.set(token, !old);
+};
+const isAtLeastOneChecked = computed(() => {
+    const validTokens = new Set(links.value.map((link) => link.token));
+
+    for (let [token, checked] of selectedMap.value) {
+        if (checked && validTokens.has(token)) {
+            return true;
+        }
+    }
+
+    return false;
+});
+const isDeleting = ref(false);
+const deleteShareLinks = async () => {
+    // TODO: Batch API?
+    isDeleting.value = true;
+
+    try {
+        const validTokens = new Set(links.value.map((link) => link.token));
+
+        for (const [token, checked] of selectedMap.value) {
+            if (checked && validTokens.has(token)) {
+                await fetch(
+                    `${
+                        import.meta.env.VITE_ENDPOINT_BASE_URL
+                    }/user-images/share-link/${encodeURIComponent(token)}`,
+                    {
+                        headers: toRaw(credentialsHeader),
+                        method: "delete",
+                    }
+                );
+
+                // TODO: Error state?
+            }
+        }
+
+        deleteShareLinkDialog.value.close();
+        await fetchShareLinks();
+    } finally {
+        isDeleting.value = false;
+    }
+};
+
 defineExpose({
     showModal,
     close,
@@ -74,11 +133,16 @@ defineExpose({
 </script>
 
 <template>
-    <dialog ref="dialog" @close="$emit('close', $event)">
+    <dialog ref="dialog" class="main-dialog" @close="$emit('close', $event)">
         <div class="main">
             <p class="title">Existing share links:</p>
             <ul v-if="hasLink">
                 <li v-for="link in links" :key="link.url">
+                    <input
+                        type="checkbox"
+                        :checked="isChecked(link.token)"
+                        @click="toggle(link.token)"
+                    />
                     <span class="url">
                         {{ link.url }}
                     </span>
@@ -90,15 +154,41 @@ defineExpose({
             <div v-else class="no-link-created-div">
                 <span>This image hasn't been shared.</span>
             </div>
-            <button class="close-button" type="button" @click.prevent="close">
-                Close
-            </button>
+            <div class="close-button">
+                <dialog ref="deleteShareLinkDialog">
+                    Delete share links?
+                    <button
+                        class="small-button"
+                        type="button"
+                        :disabled="isDeleting"
+                        @click.prevent="onDeleteShareLinkDialogClose"
+                    >
+                        No
+                    </button>
+                    <button
+                        class="small-button"
+                        type="button"
+                        :disabled="isDeleting"
+                        @click.prevent="deleteShareLinks"
+                    >
+                        Yes
+                    </button>
+                </dialog>
+                <button
+                    type="button"
+                    :disabled="!isAtLeastOneChecked"
+                    @click.prevent="onDeleteShareLinkDialogShow"
+                >
+                    Delete
+                </button>
+                <button type="button" @click.prevent="close">Close</button>
+            </div>
         </div>
     </dialog>
 </template>
 
 <style scoped>
-dialog {
+.main-dialog {
     height: 80vh;
 }
 
@@ -127,6 +217,10 @@ li {
     margin: 5px 0;
 }
 
+input[type="checkbox"] {
+    margin-right: 6px;
+}
+
 .url {
     flex: 1 1 0;
     max-width: calc(min(480px, 80vw));
@@ -149,6 +243,11 @@ li {
 
 .close-button {
     align-self: flex-end;
+}
+
+.small-button,
+.close-button > button {
+    margin-left: 3px;
     border: 1px solid black;
     background: transparent;
     border-radius: 2px;
